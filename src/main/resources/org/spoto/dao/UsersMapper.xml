@@ -1,0 +1,53 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.spoto.dao.UsersMapper">
+
+    <select id="getList" resultMap="usersResultMap">
+        SELECT * FROM users t1
+        <include refid="whereSql"></include>
+    </select>
+
+    <select id="listCount" resultType="java.lang.Integer">
+        SELECT count(*) FROM users t1
+        <include refid="whereSql"></include>
+    </select>
+
+    <sql id="whereSql">
+        <where>
+            <if test="username != null and username != ''">
+                AND t1.username LIKE CONCAT('%',#{username},'%')
+            </if>
+            <if test="password != null and password != ''">
+                AND t1.password LIKE CONCAT('%',#{password},'%')
+            </if>
+        </where>
+    </sql>
+
+    <resultMap id="usersResultMap" type="org.spoto.model.Users">
+    </resultMap>
+
+    <insert id="addUser" keyProperty="user.id" useGeneratedKeys="true">
+        INSERT INTO users (username, password, nickname, email)
+        VALUES (#{user.username}, #{user.password}, #{user.nickname}, #{user.email})
+    </insert>
+
+    <update id="updateUser">
+        UPDATE users
+        SET username = #{user.username},
+            password = #{user.password},
+            nickname = #{user.nickname},
+            email    = #{user.email}
+        WHERE id = #{user.id}
+    </update>
+
+    <delete id="deleteUsers">
+        DELETE FROM users WHERE id IN (
+        <foreach collection="ids" item="id" separator=",">
+            #{id}
+        </foreach>
+        )
+    </delete>
+
+
+</mapper>
